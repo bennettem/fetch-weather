@@ -116,7 +116,8 @@ $(function () {
   $("#search-btn").click(function () {
     city = $("#city-name").val();
     getData();
-    var historyArray = historyList.includes(city);
+    var historyArray = history;
+    List.includes(city);
     if (historyArray == true) {
       return;
     } else {
