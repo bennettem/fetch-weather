@@ -96,26 +96,35 @@ $(function () {
       });
 
       // ajax for 5 day forecast
-      $.ajax({
-        url:
-          "https://api.openweathermap.org/data/2.5/forecast?q=" +
-          city +
-          "&appid=" +
-          apiKey,
-        method: "GET",
-      }).then(function (response) {
-        // create 5 different class cols for each day
-        for (i = 0; i < 5; i++) {
-          var newDay = $("<div>").attr("class", "col five-day bg-primary");
-          $("#five-day").append(newDay);
-          // figure out how to use moment for dates *used help from stackOverflow**
-          var forecastDate = new Date(response.list[i * 8].dt * 1000);
-          newDay.append($("<h4>").html(forecastDate.toLocaleDateString()));
-          //fix bug issues for forecast fields
-        }
-      });
-    });
-  }
+ function getFiveDay (lat, lon){
+  fetch(
+    "https://api.openweathermap.org/data/2.5/onecall?lat=" +
+      lat +
+      "&lon=" +
+      lon +
+      "&appid=" +
+      weatherApiKey +
+      "&exclude=hourly,minutely&units=imperial"
+  )
+  .then(function(response){
+    return response.json();
+  })
+  .then(function (forecastData){
+    for (i < 0; i < 5; i++) {
+      var newDay = $("<div>").addClass("card");
+      var dateHeader = $("<div>").addClass("card-divider").html(moment().add(i, "d").format("MM/DD/YYYY"))
+      var newDayBody = $("<div>").addClass("card-section");
+      var weatherDayIcon = $("<img>").attr( "src",
+      "http://openweathermap.org/img/wn/" + weatherIcon + ".png"
+    );
+    var temp = $("<p>").text( "Temperature: " + forecastData.daily[i].temp + " &deg");
+    var humidity = $("<p>").text("Humidity: " + forecastData.daily[i].humidity + "%")
+    newDayBody.append(weatherDayIcon, temp, humidity);
+    newDay.append(dateHeader,newDayBody)
+    console.log(getFiveDay)
+    }
+  })
+ }
 
   //  click function for history
   //come back and fix bugs for search history
