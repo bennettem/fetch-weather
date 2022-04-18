@@ -33,11 +33,14 @@ $(function () {
       "https://api.openweathermap.org/data/2.5/weather?q=" +
       city +
       "&appid=" +
-      apiKey;
+      apiKey +
+      "&units=imperial";
 
     currentCard.empty();
 
     //ajax request
+
+    var weatherIconH = $(".weatherIcon");
 
     $.ajax({
       url: currentURL,
@@ -45,8 +48,11 @@ $(function () {
     }).then(function (response) {
       var currentDate = moment().format("LL");
       var weatherIcon = response.weather[0].icon;
-      var weatherIconUrl =
-        "https://openweathermap.org/img/w/" + weatherIcon + ".png";
+      var weatherIconUrl = $("<img>").attr(
+        "src",
+        "http://openweathermap.org/img/wn/" + weatherIcon + ".png"
+      );
+      currentCard.append(weatherIconUrl);
       // add into html city and date
       var currentCity = $("<h3>").html(city + " " + currentDate);
       // prepend
@@ -79,13 +85,13 @@ $(function () {
         );
         // add in classes for color warnings
         if (response.value <= 2) {
-          $("span").attr("class", "btn btn-outline-success");
+          $("span").attr("class", "btn btn-success");
         }
         if (response.value > 2 && response.value <= 5) {
-          $("span").attr("class", "btn btn-outline-warning");
+          $("span").attr("class", "btn btn-warning");
         }
         if (response.value > 5) {
-          $("span").attr("class", "btn btn-outline-danger");
+          $("span").attr("class", "btn btn-danger");
         }
       });
 
@@ -116,8 +122,7 @@ $(function () {
   $("#search-btn").click(function () {
     city = $("#city-name").val();
     getData();
-    var historyArray = history;
-    List.includes(city);
+    var historyArray = historyList.includes(city);
     if (historyArray == true) {
       return;
     } else {
