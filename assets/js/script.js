@@ -25,10 +25,13 @@ $(function () {
 
   var city;
   var currentCard = $(".current-card");
+  var newDay = $("#five-day");
 
   getHistory();
 
   function getData() {
+    currentCard.empty();
+    newDay.empty();
     var currentURL =
       "https://api.openweathermap.org/data/2.5/weather?q=" +
       city +
@@ -36,11 +39,7 @@ $(function () {
       apiKey +
       "&units=imperial";
 
-    currentCard.empty();
-
     //ajax request
-
-    var weatherIconH = $(".weatherIcon");
 
     $.ajax({
       url: currentURL,
@@ -94,40 +93,53 @@ $(function () {
           $("span").attr("class", "btn btn-danger");
         }
       });
+      // get forecast data
+      function getForecast(lat, lon) {
+        // ajax for 5 day forecast
+        $.ajax({
+          url:
+            "https://api.openweathermap.org/data/2.5/forecast?lat=" +
+            lat +
+            "&lon=" +
+            lon +
+            "&appid=" +
+            apiKey +
+            "&exclude=hourly,daily,minutely&units=imperial",
+          method: "GET",
+        }).then(function (fiveday) {
+          // create 5 different class cols for each day
+          for (i = 0; i < 5; i++) {
+            newDay = $("<div>").attr("class", "card five-day bg-primary");
+            $("#five-day").append(newDay);
+            var forecastDate = $("<h4>").html(
+              moment().add(i, "d").format("MM/DD/YYYY")
+            );
+            // enter info into card
+            var cardBody = $("<div>").attr("card-body card-body-bg");
 
-      // ajax for 5 day forecast
- function getFiveDay (lat, lon){
-  fetch(
-    "https://api.openweathermap.org/data/2.5/onecall?lat=" +
-      lat +
-      "&lon=" +
-      lon +
-      "&appid=" +
-      weatherApiKey +
-      "&exclude=hourly,minutely&units=imperial"
-  )
-  .then(function(response){
-    return response.json();
-  })
-  .then(function (forecastData){
-    for (i < 0; i < 5; i++) {
-      var newDay = $("<div>").addClass("card");
-      var dateHeader = $("<div>").addClass("card-divider").html(moment().add(i, "d").format("MM/DD/YYYY"))
-      var newDayBody = $("<div>").addClass("card-section");
-      var weatherDayIcon = $("<img>").attr( "src",
-      "http://openweathermap.org/img/wn/" + weatherIcon + ".png"
-    );
-    var temp = $("<p>").text( "Temperature: " + forecastData.daily[i].temp + " &deg");
-    var humidity = $("<p>").text("Humidity: " + forecastData.daily[i].humidity + "%")
-    newDayBody.append(weatherDayIcon, temp, humidity);
-    newDay.append(dateHeader,newDayBody)
-    console.log(getFiveDay)
-    }
-  })
- }
+            var cardWeatherIcon = $("<img>").attr(
+              "src",
+              "http://openweathermap.org/img/wn/" +
+                fiveday.weather[0].icon +
+                ".png"
+            );
+            var cardTemp = $("<p>").html(
+              "Temperature: " + fiveday.main.temp + " &deg"
+            );
+            var cardHum = $("<p>").html("Humidity: " + fiveday.main.humidity);
+
+            //add data to cards
+            cardBody.append(cardWeatherIcon, cardTemp, cardHum);
+            newDay.append(forecastDate, cardBody);
+            // add card to id in html
+            $("#five-day").append(newDay);
+          }
+        });
+      }
+    });
+  }
 
   //  click function for history
-  //come back and fix bugs for search history
   $("#search-btn").click(function () {
     city = $("#city-name").val();
     getData();
@@ -149,4 +161,5 @@ $(function () {
     city = $(this).text();
     getData();
   });
+  getHistory();
 });
